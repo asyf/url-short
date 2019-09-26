@@ -67,6 +67,8 @@ urlSchema.pre('save', async (next) => {
     if (!counter) {
         await new counterModel({ _id: 'url_count', count: 1 });
     }
+
+    next();
 });
 
 let URL = mongoose.model('URL', urlSchema);
