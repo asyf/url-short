@@ -57,17 +57,16 @@ urlSchema.plugin(timestamps);
 // we are doing here is incrementing the counter in the Counter collection which
 // then becomes the unique ID for the new document to be inserted in the URL
 // collection
-urlSchema.pre('save', function (next) {
+urlSchema.pre('save', async (next) => {
     console.log('APP: Running pre-save');
-    var that = this;
-    counterModel.findByIdAndUpdate({ _id: 'url_count' }, { $inc: { count: 1 } }, function (err, counter) {
-        if (err) {
-            console.error('APP: Error while finding and updating counter value');
-            return next(err)
-        };
-        that._id = counter.count;
-        next();
-    });
+
+    let counter = await counterModel.findByIdAndUpdate({ _id: 'url_count' }, { $inc: { count: 1 } });
+
+    console.log(counter);
+
+    if (!counter) {
+        await new counterModel({ _id: 'url_count', count: 1 });
+    }
 });
 
 let URL = mongoose.model('URL', urlSchema);
@@ -143,7 +142,7 @@ app.post('/shorten', async (req, res, next) => {
         const urlData = req.body.url;
 
         const doc = await URL.findOne({ url: urlData });
-    
+
         if (doc) {
             console.log('APP: URL found in DB');
             res.send({
@@ -157,9 +156,9 @@ app.post('/shorten', async (req, res, next) => {
             var url = new URL({
                 url: urlData
             });
-    
+
             await url.save();
-            
+
             res.send({
                 url: urlData,
                 hash: btoa(url._id),
