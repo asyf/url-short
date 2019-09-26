@@ -65,7 +65,7 @@ urlSchema.pre('save', async (next) => {
     console.log(counter);
 
     if (!counter) {
-        await new counterModel({ _id: 'url_count', count: 1 });
+        await new counterModel({ _id: 'url_count', count: 1 }).save();
     }
 
     next();
@@ -144,7 +144,8 @@ app.post('/shorten', async (req, res, next) => {
     try {
         const urlData = req.body.url;
 
-        const doc = await URL.findOne({ url: urlData });
+        const doc = await URL.findOne({ url: urlData }),
+              lengthOFDocs = await URL.count();
 
         if (doc) {
             console.log('APP: URL found in DB');
@@ -157,6 +158,7 @@ app.post('/shorten', async (req, res, next) => {
         } else {
             console.log('APP: URL not found in DB, creating new document');
             var url = new URL({
+                _id: lengthOFDocs,
                 url: urlData
             });
 
