@@ -127,6 +127,7 @@ app.get('/:hash', async (req, res) => {
             console.log('APP: Could not find ID');
         }
     } catch (err) {
+        console.log(err);
         console.log('APP: There was error processing request');
         res.status(500);
         res.json({
@@ -169,6 +170,7 @@ app.post('/shorten', async (req, res, next) => {
             });
         }
     } catch (err) {
+        console.log(err);
         console.log('APP: There was error processing request');
         res.status(500);
         res.json({
