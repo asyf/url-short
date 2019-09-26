@@ -25,6 +25,7 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(bodyParser.json());
 
 // Base route for front-end
 app.get('/', function (req, res) {
@@ -141,8 +142,6 @@ app.get('/:hash', async (req, res) => {
 
 // API for shortening
 app.post('/shorten', async (req, res, next) => {
-
-    console.log(req.body);
     try {
         const urlData = req.body.url;
 
