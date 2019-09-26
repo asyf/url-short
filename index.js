@@ -142,6 +142,7 @@ app.get('/:hash', async (req, res) => {
 // API for shortening
 app.post('/shorten', async (req, res, next) => {
 
+    console.log(req.body);
     try {
         const urlData = req.body.url;
 
@@ -151,7 +152,7 @@ app.post('/shorten', async (req, res, next) => {
         if (doc) {
             console.log('APP: URL found in DB');
             res.send({
-                url: urlData,
+                url: urlData  || '',
                 hash: btoa(doc._id),
                 status: 200,
                 statusTxt: 'OK'
