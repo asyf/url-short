@@ -118,6 +118,7 @@ app.get('/:hash', async (req, res) => {
 
             if (doc) {
                 console.log('APP: Found ID in DB, redirecting to URL');
+                console.log(doc.url);
                 res.redirect(doc.url);
             } else {
                 console.log('APP: Could not find ID in DB, redirecting to home');
