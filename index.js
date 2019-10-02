@@ -12,7 +12,8 @@ const express = require('express'),
     atob = require('atob'),
     mongoURI = process.env.mongoURI,
     port = process.env.PORT || 80,
-    timestamps = require('mongoose-timestamp');
+    timestamps = require('mongoose-timestamp'),
+    randomize = require('randomatic');
 
 // ExpressJS server start
 http.listen(port, function () {
@@ -47,7 +48,8 @@ let counterModel = mongoose.model('Counter', countersSchema);
 // URL Collection Schema
 let urlSchema = new mongoose.Schema({
     _id: { type: Number },
-    url: ''
+    url: '',
+    hash: { type : String }
 });
 
 urlSchema.plugin(timestamps);
@@ -113,9 +115,9 @@ app.get('/:hash', async (req, res) => {
         const baseid = req.params.hash;
         if (baseid) {
             console.log('APP: Hash received: ' + baseid);
-            const id = atob(baseid);
+            const id = baseid;
             console.log('APP: Decoding Hash: ' + baseid);
-            let doc = await URL.findOne({ _id: id });
+            let doc = await URL.findOne({ hash: id });
 
             if (doc) {
                 console.log('APP: Found ID in DB, redirecting to URL');
@@ -152,7 +154,7 @@ app.post('/shorten', async (req, res, next) => {
             console.log('APP: URL found in DB');
             res.send({
                 url: urlData  || '',
-                hash: btoa(doc._id),
+                hash: doc.hash,
                 status: 200,
                 statusTxt: 'OK'
             });
@@ -163,11 +165,14 @@ app.post('/shorten', async (req, res, next) => {
                 url: urlData
             });
 
-            await url.save();
+            let saveUrl = await url.save(),
+                randomString = randomize('Aa0', 5) + saveUrl._id;
+                saveUrl.hash = randomString;
+                saveUrl.save();
 
             res.send({
                 url: urlData,
-                hash: btoa(url._id),
+                hash: saveUrl.hash,
                 status: 200,
                 statusTxt: 'OK'
             });
